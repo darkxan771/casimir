@@ -1,0 +1,39 @@
+[project]
+name = "hypocasimir"
+version = "0.1"
+description = "A package to manipulate large random rooted trees"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Pierre-Loïc Méliot", email = "pierreloic.meliot@gmail.com" }
+]
+keywords = [
+  "brownian motion",
+  "casimir",
+  "lie group",
+  "mathematics",
+  "probability",
+  "representation"
+]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/darkxan771/casimir"
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
