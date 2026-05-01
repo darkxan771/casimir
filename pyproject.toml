@@ -1,7 +1,7 @@
 [project]
 name = "hypocasimir"
 version = "0.1"
-description = "A package to manipulate large random rooted trees"
+description = "A package to manipulate Lie groups and their representations" 
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
