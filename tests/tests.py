@@ -23,7 +23,7 @@ def test_SUSO():
     assert G.dimension == 24
     assert X.dimension == 14
     assert X.isometry_group == G
-    assert X.isotropy_group == K
+    assert X.isotropy_group == [K]
     assert G.rank == 4
     assert K.rank == 2
     assert G.weight_space == RW
@@ -33,17 +33,17 @@ def test_SUSO():
     assert P.size == 10
     assert P.dimension(G) == 2700
     assert P.casimir(G) == Rational(-22, 5)
-    assert P.highest_K_type(X) == Partition([5, 3])
+    assert P.highest_K_type(X) == [Partition([5, 3])]
     assert P.hypocasimir(X) == Rational(-9, 5)
     G2 = LieGroup("SU", 6)
     K2 = LieGroup("SO", 6)
     X2 = SymmetricSpace("SU/SO", 6)
     assert X2.isometry_group == G2
-    assert X2.isotropy_group == K2
+    assert X2.isotropy_group == [K2]
     assert K2.rank == 3
     assert P.dimension(G2) == 15750
     assert P.casimir(G2) == Rational(-43, 9)
-    assert P.highest_K_type(X2) == Signature([5, 3, 2])
+    assert P.highest_K_type(X2) == [Signature([5, 3, 2])]
     assert P.hypocasimir(X2) == Rational(-19, 9)
 
 
@@ -56,10 +56,10 @@ def test_SU2SP():
     assert G.dimension == 99
     assert X.dimension == 44
     assert X.isometry_group == G
-    assert X.isotropy_group == K
+    assert X.isotropy_group == [K]
     assert P.dimension(G) == 11561550
     assert P.casimir(G) == Rational(-132, 25)
-    assert P.highest_K_type(X) == P
+    assert P.highest_K_type(X) == [P]
     assert P.hypocasimir(X) == Rational(-99, 50)
 
 
@@ -74,7 +74,7 @@ def test_SPU():
     assert G.dimension == 55
     assert X.dimension == 30
     assert X.isometry_group == G
-    assert X.isotropy_group == K
+    assert X.isotropy_group == [K]
     assert G.rank == 5
     assert K.rank == 5
     assert G.weight_space == RW
@@ -82,7 +82,7 @@ def test_SPU():
     assert RW.killing_coefficient == 12
     assert P.dimension(G) == 1514700
     assert P.casimir(G) == Rational(-31, 6)
-    assert P.highest_K_type(X) == Signature([5, 3, 2, 0, 0])
+    assert P.highest_K_type(X) == [Signature([5, 3, 2, 0, 0])]
     assert P.hypocasimir(X) == Rational(-5, 2)
 
 
@@ -97,7 +97,7 @@ def test_SO2U():
     assert G.dimension == 45
     assert X.dimension == 20
     assert X.isometry_group == G
-    assert X.isotropy_group == K
+    assert X.isotropy_group == [K]
     assert G.rank == 5
     assert K.rank == 5
     assert G.weight_space == RW
@@ -105,7 +105,7 @@ def test_SO2U():
     assert RW.killing_coefficient == 8
     assert P.dimension(G) == 1316250
     assert P.casimir(G) == Rational(-13, 2)
-    assert P.highest_K_type(X) == Signature([5, 3, 2, 0, 0])
+    assert P.highest_K_type(X) == [Signature([5, 3, 2, 0, 0])]
     assert P.hypocasimir(X) == Rational(-5, 2)
 
 
@@ -119,18 +119,18 @@ def test_GrR():
     assert G1.dimension == 45
     assert X1.dimension == 24
     assert X1.isometry_group == G1
-    assert X1.isotropy_group == (K11, K12)
+    assert X1.isotropy_group == [K11, K12]
     assert G1.rank == 5
     assert P.dimension(G1) == 2502500
     assert P.casimir(G1) == Rational(-27, 4)
-    assert P.highest_K_type(X1) == (Signature([5, 3, 2]), Signature([1, 1]))
+    assert P.highest_K_type(X1) == [Signature([5, 3, 2]), Signature([1, 1])]
     assert P.hypocasimir(X1) == Rational(-5, 2)
     X2 = SymmetricSpace("GrR", (7, 3))
-    assert P.highest_K_type(X2) == (Partition([5, 3, 2]), Partition([1]))
+    assert P.highest_K_type(X2) == [Partition([5, 3, 2]), Partition([1])]
     assert P.hypocasimir(X2) == -2
     X3 = SymmetricSpace("GrR", (7, 4))
     P = Partition([5, 3, 2, 1, 1])
-    assert P.highest_K_type(X3) == (Partition([5, 3, 2]), Signature([1, 1]))
+    assert P.highest_K_type(X3) == [Partition([5, 3, 2]), Signature([1, 1])]
     assert P.hypocasimir(X3) == Rational(-7, 3)
 
 
@@ -146,13 +146,13 @@ def test_GrC():
     assert G.rank == 6
     assert P.dimension(G) == 107800
     assert P.casimir(G) == Rational(-222, 49)
-    assert P.highest_K_type(X) == (Signature([5, 3, 2, 1]), Partition([1]))
+    assert P.highest_K_type(X) == [Signature([5, 3, 2, 1]), Partition([1])]
     assert P.hypocasimir(X) == Rational(-29, 14)
 
 
 def test_GrH():
     G = LieGroup("SP", 7)
-    K = (LieGroup("SP", 4), LieGroup("SP", 3))
+    K = [LieGroup("SP", 4), LieGroup("SP", 3)]
     X = SymmetricSpace("GrH", (4, 3))
     P = Partition([5, 3, 2, 1, 1])
     assert G.description == "Compact Symplectic Group SP(7)"
@@ -167,5 +167,5 @@ def test_GrH():
     assert G.rank == 7
     assert P.dimension(G) == 506970464
     assert P.casimir(G) == Rational(-45, 8)
-    assert P.highest_K_type(X) == (Partition([5, 3, 2, 1]), Partition([1]))
+    assert P.highest_K_type(X) == [Partition([5, 3, 2, 1]), Partition([1])]
     assert P.hypocasimir(X) == Rational(-33, 16)

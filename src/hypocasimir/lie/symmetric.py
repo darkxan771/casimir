@@ -1,24 +1,26 @@
-from typing import Any, Callable
+from typing import Callable
 
 from .groups import LieGroup
 
-space_dimension: dict[str, Callable[..., int]] = {}
-space_dimension["SU/SO"] = lambda n: int((n - 1) * (n + 2) / 2)
-space_dimension["SU2/SP"] = lambda n: int(2 * n * n - 1 - n)
-space_dimension["SP/U"] = lambda n: int(n * (n + 1))
-space_dimension["SO2/U"] = lambda n: int(n * (n - 1))
-space_dimension["GrR"] = lambda p, q: int(p * q)
-space_dimension["GrC"] = lambda p, q: int(2 * p * q)
-space_dimension["GrH"] = lambda p, q: int(4 * p * q)
+space_dimension_structure: dict[str, Callable[[int], int]] = {}
+space_dimension_structure["SU/SO"] = lambda n: int((n - 1) * (n + 2) / 2)
+space_dimension_structure["SU2/SP"] = lambda n: int(2 * n * n - 1 - n)
+space_dimension_structure["SP/U"] = lambda n: int(n * (n + 1))
+space_dimension_structure["SO2/U"] = lambda n: int(n * (n - 1))
+space_dimension_grassmann: dict[str, Callable[[int, int], int]] = {}
+space_dimension_grassmann["GrR"] = lambda p, q: int(p * q)
+space_dimension_grassmann["GrC"] = lambda p, q: int(2 * p * q)
+space_dimension_grassmann["GrH"] = lambda p, q: int(4 * p * q)
 
-compute_repr: dict[str, Callable[..., str]] = {}
-compute_repr["SU/SO"] = lambda n: f"SU({n})/SO({n})"
-compute_repr["SU2/SP"] = lambda n: f"SU({2 * n})/SP({n})"
-compute_repr["SP/U"] = lambda n: f"SP({n})/U({n})"
-compute_repr["SO2/U"] = lambda n: f"SO({2 * n})/U({n})"
-compute_repr["GrR"] = lambda p, q: f"SO({p + q})/(SO({p}) x SO({q}))"
-compute_repr["GrC"] = lambda p, q: f"SU({p + q})/S(U({p}) x U({q}))"
-compute_repr["GrH"] = lambda p, q: f"SP({p + q})/(SP({p}) x SP({q}))"
+compute_repr_structure: dict[str, Callable[[int], str]] = {}
+compute_repr_structure["SU/SO"] = lambda n: f"SU({n})/SO({n})"
+compute_repr_structure["SU2/SP"] = lambda n: f"SU({2 * n})/SP({n})"
+compute_repr_structure["SP/U"] = lambda n: f"SP({n})/U({n})"
+compute_repr_structure["SO2/U"] = lambda n: f"SO({2 * n})/U({n})"
+compute_repr_grassmann: dict[str, Callable[[int, int], str]] = {}
+compute_repr_grassmann["GrR"] = lambda p, q: f"SO({p + q})/(SO({p}) x SO({q}))"
+compute_repr_grassmann["GrC"] = lambda p, q: f"SU({p + q})/S(U({p}) x U({q}))"
+compute_repr_grassmann["GrH"] = lambda p, q: f"SP({p + q})/(SP({p}) x SP({q}))"
 
 compute_field: dict[str, str] = {}
 compute_field["SU/SO"] = "real"
@@ -38,13 +40,14 @@ compute_G["GrR"] = lambda n: LieGroup("SO", n)
 compute_G["GrC"] = lambda n: LieGroup("SU", n)
 compute_G["GrH"] = lambda n: LieGroup("SP", n)
 
-compute_K: dict[str, Callable] = {}
-compute_K["SU/SO"] = lambda n: LieGroup("SO", n)
-compute_K["SU2/SP"] = lambda n: LieGroup("SP", n)
-compute_K["SP/U"] = lambda n: LieGroup("U", n)
-compute_K["SO2/U"] = lambda n: LieGroup("U", n)
-compute_K["GrR"] = lambda p, q: (LieGroup("SO", p), LieGroup("SO", q))
-compute_K["GrH"] = lambda p, q: (LieGroup("SP", p), LieGroup("SP", q))
+compute_K_structure: dict[str, Callable[[int], list[LieGroup]]] = {}
+compute_K_structure["SU/SO"] = lambda n: [LieGroup("SO", n)]
+compute_K_structure["SU2/SP"] = lambda n: [LieGroup("SP", n)]
+compute_K_structure["SP/U"] = lambda n: [LieGroup("U", n)]
+compute_K_structure["SO2/U"] = lambda n: [LieGroup("U", n)]
+compute_K_grassmann: dict[str, Callable[[int, int], list[LieGroup]]] = {}
+compute_K_grassmann["GrR"] = lambda p, q: [LieGroup("SO", p), LieGroup("SO", q)]
+compute_K_grassmann["GrH"] = lambda p, q: [LieGroup("SP", p), LieGroup("SP", q)]
 
 
 class SymmetricSpace:
@@ -78,9 +81,9 @@ class SymmetricSpace:
 
     def __repr__(self):
         if self.stype == "structure":
-            return compute_repr[self.type](self.n)
+            return compute_repr_structure[self.type](self.n)
         else:
-            return compute_repr[self.type](self.p, self.q)
+            return compute_repr_grassmann[self.type](self.p, self.q)
 
     @property
     def description(self) -> str:
@@ -100,9 +103,9 @@ class SymmetricSpace:
     @property
     def dimension(self) -> int:
         if self.stype == "structure":
-            return space_dimension[self.type](self.n)
+            return space_dimension_structure[self.type](self.n)
         else:
-            return space_dimension[self.type](self.p, self.q)
+            return space_dimension_grassmann[self.type](self.p, self.q)
 
     @property
     def isometry_group(self) -> LieGroup:
@@ -113,15 +116,15 @@ class SymmetricSpace:
         return compute_G[self.type](self.n)
 
     @property
-    def isotropy_group(self) -> Any:
+    def isotropy_group(self) -> list[LieGroup]:
         """
         Returns the stabilizer K of a point for the action of the
         isometry group G on X=G/K. Not implemented for complex Grassmannian
         manifolds.
         """
         if self.stype == "structure":
-            return compute_K[self.type](self.n)
+            return compute_K_structure[self.type](self.n)
         else:
             if self.type == "GrC":
                 raise NotImplementedError
-            return compute_K[self.type](self.p, self.q)
+            return compute_K_grassmann[self.type](self.p, self.q)

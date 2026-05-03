@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Protocol, Sequence
+from collections.abc import Sequence
+from typing import Any, Protocol
 
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
@@ -60,10 +61,14 @@ class Label(Protocol):
 
     def highest_weight(self, G: LieGroup) -> Weight: ...
 
-    def highest_K_type(self, X: SymmetricSpace) -> Label: ...
+    def highest_K_type(self, X: SymmetricSpace) -> list[Label]: ...
 
     def dimension(self, G: LieGroup) -> int: ...
 
     def casimir(self, G: LieGroup, coeff: None | int) -> Any: ...
 
     def hypocasimir(self, X: SymmetricSpace) -> Any: ...
+
+
+def general_casimir(L: list[Label], G: list[LieGroup], coeff):
+    return sum([L[i].casimir(G[i], coeff) for i in range(len(L))])

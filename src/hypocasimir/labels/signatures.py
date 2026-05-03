@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from math import prod
-from typing import Callable, Sequence
+from typing import Callable
 
 import matplotlib.pyplot as plt
 from sympy import Rational
 
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
-from .labels import Label
+from .labels import Label, general_casimir
 
 
 class NotLabelError(Exception):
@@ -18,31 +19,37 @@ class NotLabelError(Exception):
         )
 
 
-def cht_SO2U(n: int, L: Sequence[int]) -> Signature:
+def cht_SO2U(n: int, L: Sequence[int]) -> list[Label]:
     S = Signature(L)
     if len(S) != n or not S.is_signed_partition:
         raise NotLabelError
-    return S
+    return [S]
 
 
-def cht_GrR(p: int, q: int, L: Sequence[int]) -> tuple[Label, Label]:
+def cht_GrR(p: int, q: int, L: Sequence[int]) -> list[Label]:
     n = p + q
     S = Signature(L)
     if len(S) != int(n / 2) or not S.is_signed_partition:
         raise NotLabelError
     if p % 2 == 0:
-        return Signature(L[: int(p / 2)]), Signature(L[int(p / 2) :])
+        return [Signature(L[: int(p / 2)]), Signature(L[int(p / 2) :])]
     else:
         from .partitions import Partition
 
-        return Partition(L[: int((p - 1) / 2)]), Partition(
-            L[int((p + 1) / 2) :]
-        )
+        return [
+            Partition(L[: int((p - 1) / 2)]),
+            Partition(L[int((p + 1) / 2) :]),
+        ]
 
 
-compute_highest_type: dict[str, Callable] = {}
-compute_highest_type["SO2/U"] = cht_SO2U
-compute_highest_type["GrR"] = cht_GrR
+compute_highest_type_structure: dict[
+    str, Callable[[int, Sequence[int]], list[Label]]
+] = {}
+compute_highest_type_structure["SO2/U"] = cht_SO2U
+compute_highest_type_grassmann: dict[
+    str, Callable[[int, int, Sequence[int]], list[Label]]
+] = {}
+compute_highest_type_grassmann["GrR"] = cht_GrR
 
 
 class Signature(Label):
@@ -87,16 +94,16 @@ class Signature(Label):
             raise NotLabelError
         return Weight("D", self.terms)
 
-    def highest_K_type(self, X: SymmetricSpace):
+    def highest_K_type(self, X: SymmetricSpace) -> list[Label]:
         """
         Given a symmetric space X=G/K, computes the highest K-type of the
         restriction of the irreducible representation of G labelled
         by the signature.
         """
         if X.stype == "structure":
-            return compute_highest_type[X.type](X.n, self.terms)
+            return compute_highest_type_structure[X.type](X.n, self.terms)
         else:
-            return compute_highest_type[X.type](X.p, X.q, self.terms)
+            return compute_highest_type_grassmann[X.type](X.p, X.q, self.terms)
 
     def dimension(self, G: LieGroup) -> int:
         """
@@ -148,13 +155,11 @@ class Signature(Label):
             raise NotLabelError
         coeff = G.weight_space.killing_coefficient
         CG = self.casimir(G)
+        K = X.isotropy_group
+        L = self.highest_K_type(X)
         if X.type == "SO2/U":
-            K = X.isotropy_group
-            CK = self.highest_K_type(X).casimir(K, 2 * coeff)
-        else:
-            K1, K2 = X.isotropy_group
-            L, M = self.highest_K_type(X)
-            CK = L.casimir(K1, coeff) + M.casimir(K2, coeff)
+            coeff *= 2
+        CK = general_casimir(L, K, coeff)
         return CG - CK
 
     def draw(self) -> None:
