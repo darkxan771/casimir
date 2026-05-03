@@ -11,7 +11,7 @@ from ..systems import Weight
 from .labels import Label, TooLongError, complete_list, general_casimir
 from .signatures import NotLabelError, Signature
 
-convert_highest_weight: dict[str, Callable[[int, list], Weight]] = {}
+convert_highest_weight: dict[str, Callable[[int, list[int]], Weight]] = {}
 convert_highest_weight["A"] = lambda n, L: Weight(
     "A", [x - Fraction(sum(L), n + 1) for x in complete_list(n, L) + [0]]
 )
@@ -63,12 +63,16 @@ def cht_GrH(p: int, q: int, L: Sequence[int]) -> list[Label]:
     return [Partition(M[:p]), Partition(M[p:])]
 
 
-compute_highest_type_structure: dict[str, Callable] = {}
+compute_highest_type_structure: dict[
+    str, Callable[[int, Sequence[int]], list[Label]]
+] = {}
 compute_highest_type_structure["SU/SO"] = cht_SUSO
 compute_highest_type_structure["SU2/SP"] = cht_SU2SP
 compute_highest_type_structure["SP/U"] = cht_SPU
 
-compute_highest_type_grassmann: dict[str, Callable] = {}
+compute_highest_type_grassmann: dict[
+    str, Callable[[int, int, Sequence[int]], list[Label]]
+] = {}
 compute_highest_type_grassmann["GrR"] = cht_GrR
 compute_highest_type_grassmann["GrC"] = cht_GrC
 compute_highest_type_grassmann["GrH"] = cht_GrH
@@ -87,7 +91,7 @@ class Partition(Label):
             raise ValueError("All parts should be positive integers.")
         if any(L[i] < L[i + 1] for i in range(len(L) - 1)):
             raise ValueError("The parts should be in nonincreasing order.")
-        self.terms = list(filter((0).__ne__, L))
+        self.terms: list[int] = list(filter((0).__ne__, L))
 
     def highest_weight(self, G: LieGroup) -> Weight:
         """
@@ -117,7 +121,7 @@ class Partition(Label):
         """
         return self.highest_weight(G).weyl_dimension()
 
-    def casimir(self, G: LieGroup, coeff: None | int = None):
+    def casimir(self, G: LieGroup, coeff: None | int = None) -> Fraction:
         """
         Computes the Casimir coefficient of the action of the elliptic
         Laplace-Beltrami operator on the irreducible representation of
@@ -125,7 +129,7 @@ class Partition(Label):
         """
         return self.highest_weight(G).casimir(coeff)
 
-    def hypocasimir(self, X: SymmetricSpace):
+    def hypocasimir(self, X: SymmetricSpace) -> Fraction:
         """
         Computes the maximal Casimir coefficient of the action of the
         hypoelliptic Laplace-Beltrami operator on the irreducible
@@ -134,22 +138,22 @@ class Partition(Label):
         G = X.isometry_group
         L = self.highest_K_type(X)
         coeff = G.weight_space.killing_coefficient
-        CG = self.casimir(G)
+        cG = self.casimir(G)
         if X.type == "GrC":
             n, p, q = X.n, X.p, X.q
             K1, K2 = LieGroup("SU", p), LieGroup("SU", q)
             L1 = Partition([a - L[0].terms[-1] for a in L[0].terms[:-1]])
             L2 = L[1]
-            CK = general_casimir([L1, L2], [K1, K2], coeff)
-            CK -= Fraction(
+            cK = general_casimir([L1, L2], [K1, K2], coeff)
+            cK -= Fraction(
                 (q * L[0].size - p * L2.size) ** 2, 2 * n * n * p * q
             )
         else:
             K = X.isotropy_group
             if X.type == "SP/U":
                 coeff *= 2
-            CK = general_casimir(L, K, coeff)
-        return CG - CK
+            cK = general_casimir(L, K, coeff)
+        return cG - cK
 
     def draw(self, style: str = "french") -> None:
         """

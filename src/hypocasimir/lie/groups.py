@@ -33,12 +33,12 @@ class LieGroup:
     def __init__(self, type: str = "SU", size: int = 1):
         if type not in {"U", "SU", "SO", "SP"}:
             raise NotImplementedError
-        self.type = type
+        self.type: str = type
         if size <= 0:
             raise ValueError("The size should be a positive integer")
-        self.size = size
+        self.size: int = size
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, LieGroup)
             and self.type == other.type

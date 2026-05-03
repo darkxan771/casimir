@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from fractions import Fraction
 from math import prod
 from typing import Callable
 
@@ -39,9 +38,9 @@ class Weight:
     """
 
     def __init__(self, system: str = "A", L: list = []):
-        self.system = system
-        self.coordinates = list(Fraction(x) for x in L)
-        self.rank = len(self.coordinates)
+        self.system: str = system
+        self.coordinates: list = list(x for x in L)
+        self.rank: int = len(self.coordinates)
         if self.system == "A":
             self.rank -= 1
 

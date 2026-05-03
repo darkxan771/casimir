@@ -56,17 +56,18 @@ class SymmetricSpace:
     """
 
     def __init__(self, type: str = "SU/SO", size: int | tuple[int, int] = 2):
+        self.type: str = type
+        self.stype: str = ""
+        self.n: int = 0
         if type in {"SU/SO", "SU2/SP", "SP/U", "SO2/U"} and isinstance(
             size, int
         ):
-            self.type = type
             self.stype = "structure"
             self.n = size
         elif type in {"GrR", "GrC", "GrH"} and isinstance(size, tuple):
-            self.type = type
             self.stype = "grassmann"
-            self.p = max(size)
-            self.q = min(size)
+            self.p: int = max(size)
+            self.q: int = min(size)
             self.n = self.p + self.q
         else:
             raise NotImplementedError

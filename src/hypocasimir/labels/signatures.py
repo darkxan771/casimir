@@ -123,7 +123,7 @@ class Signature(Label):
         else:
             raise NotLabelError
 
-    def casimir(self, G: LieGroup, coeff: None | int = None):
+    def casimir(self, G: LieGroup, coeff: None | int = None) -> Fraction:
         """
         Computes the Casimir coefficient of the action of the elliptic
         Laplace-Beltrami operator on the irreducible representation of
@@ -143,7 +143,7 @@ class Signature(Label):
         else:
             raise NotLabelError
 
-    def hypocasimir(self, X: SymmetricSpace):
+    def hypocasimir(self, X: SymmetricSpace) -> Fraction:
         """
         Computes the maximal Casimir coefficient of the action of the
         hypoelliptic Laplace-Beltrami operator on the irreducible
@@ -154,13 +154,13 @@ class Signature(Label):
         if not (G == LieGroup("SO", 2 * n) and self.is_signed_partition):
             raise NotLabelError
         coeff = G.weight_space.killing_coefficient
-        CG = self.casimir(G)
+        cG = self.casimir(G)
         K = X.isotropy_group
         L = self.highest_K_type(X)
         if X.type == "SO2/U":
             coeff *= 2
-        CK = general_casimir(L, K, coeff)
-        return CG - CK
+        cK = general_casimir(L, K, coeff)
+        return cG - cK
 
     def draw(self) -> None:
         """

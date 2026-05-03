@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, Protocol
+from fractions import Fraction
+from typing import Protocol
 
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
@@ -12,11 +13,10 @@ class TooLongError(Exception):
         super().__init__("The length of the list is too large")
 
 
-def complete_list(n, L: Sequence[int]) -> list[int]:
+def complete_list(n: int, L: Sequence[int]) -> list[int]:
     if len(L) > n:
         raise TooLongError
-    M = list(L) + [0] * (n - len(L))
-    return M
+    return list(L) + [0] * (n - len(L))
 
 
 class Label(Protocol):
@@ -30,7 +30,7 @@ class Label(Protocol):
 
     terms: list[int]
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self.terms == other.terms
 
     def __len__(self):
@@ -65,10 +65,10 @@ class Label(Protocol):
 
     def dimension(self, G: LieGroup) -> int: ...
 
-    def casimir(self, G: LieGroup, coeff: None | int) -> Any: ...
+    def casimir(self, G: LieGroup, coeff: None | int) -> Fraction: ...
 
-    def hypocasimir(self, X: SymmetricSpace) -> Any: ...
+    def hypocasimir(self, X: SymmetricSpace) -> Fraction: ...
 
 
-def general_casimir(L: list[Label], G: list[LieGroup], coeff):
+def general_casimir(L: list[Label], G: list[LieGroup], coeff: int):
     return sum([L[i].casimir(G[i], coeff) for i in range(len(L))])
