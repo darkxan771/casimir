@@ -1,4 +1,4 @@
-from sympy import Rational
+from fractions import Fraction
 
 from .weights import Weight
 
@@ -12,7 +12,7 @@ def root_A(n: int, i: int, j: int) -> Weight:
 
 
 def weight_A(n, i: int) -> Weight:
-    L = [Rational(n - i, n + 1)] * (i + 1) + [Rational(-i - 1, n + 1)] * (n - i)
+    L = [Fraction(n - i, n + 1)] * (i + 1) + [Fraction(-i - 1, n + 1)] * (n - i)
     return Weight("A", L)
 
 
@@ -35,7 +35,7 @@ def weight_B(n, i: int) -> Weight:
         L = [1] * (i + 1) + [0] * (n - i - 1)
         return Weight("B", L)
     else:
-        return Weight("B", [Rational(1, 2) for _ in range(n)])
+        return Weight("B", [Fraction(1, 2) for _ in range(n)])
 
 
 # type C
@@ -71,7 +71,7 @@ def weight_D(n, i: int) -> Weight:
         return Weight("D", L)
     elif i == n - 1:
         return Weight(
-            "D", [Rational(1, 2) for _ in range(n - 1)] + [Rational(-1, 2)]
+            "D", [Fraction(1, 2) for _ in range(n - 1)] + [Fraction(-1, 2)]
         )
     else:
-        return Weight("D", [Rational(1, 2) for _ in range(n)])
+        return Weight("D", [Fraction(1, 2) for _ in range(n)])

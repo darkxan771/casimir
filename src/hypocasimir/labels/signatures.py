@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from fractions import Fraction
 from math import prod
 from typing import Callable
 
 import matplotlib.pyplot as plt
-from sympy import Rational
 
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
@@ -137,7 +137,7 @@ class Signature(Label):
             else:
                 coe = coeff
             num = sum(M[i] * (M[i] + n - 1 - 2 * i) for i in range(n))
-            return Rational(-num, coe)
+            return Fraction(-num, coe)
         elif G == LieGroup("SO", 2 * n):
             return self.highest_weight(G).casimir(coeff)
         else:

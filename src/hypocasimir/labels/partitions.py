@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from fractions import Fraction
 from typing import Callable
 
 import matplotlib.pyplot as plt
-from sympy import Rational
 
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
@@ -13,7 +13,7 @@ from .signatures import NotLabelError, Signature
 
 convert_highest_weight: dict[str, Callable[[int, list], Weight]] = {}
 convert_highest_weight["A"] = lambda n, L: Weight(
-    "A", [x - Rational(sum(L), n + 1) for x in complete_list(n, L) + [0]]
+    "A", [x - Fraction(sum(L), n + 1) for x in complete_list(n, L) + [0]]
 )
 convert_highest_weight["B"] = lambda n, L: Weight("B", complete_list(n, L))
 convert_highest_weight["C"] = lambda n, L: Weight("C", complete_list(n, L))
@@ -141,7 +141,7 @@ class Partition(Label):
             L1 = Partition([a - L[0].terms[-1] for a in L[0].terms[:-1]])
             L2 = L[1]
             CK = general_casimir([L1, L2], [K1, K2], coeff)
-            CK -= Rational(
+            CK -= Fraction(
                 (q * L[0].size - p * L2.size) ** 2, 2 * n * n * p * q
             )
         else:

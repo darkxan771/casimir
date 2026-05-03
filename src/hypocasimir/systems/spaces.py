@@ -1,6 +1,5 @@
+from fractions import Fraction
 from typing import Callable, Container
-
-from sympy import Rational
 
 from ..lie import LieGroup
 from .named import (
@@ -92,10 +91,10 @@ lie_groups["D"] = lambda n: LieGroup("SO", 2 * n)
 # RHO
 rho_vector: dict[str, Callable[[int], Weight]] = {}
 rho_vector["A"] = lambda n: Weight(
-    "A", [Rational(n - 2 * i, 2) for i in range(n + 1)]
+    "A", [Fraction(n - 2 * i, 2) for i in range(n + 1)]
 )
 rho_vector["B"] = lambda n: Weight(
-    "B", [Rational(2 * n - 1 - 2 * i, 2) for i in range(n)]
+    "B", [Fraction(2 * n - 1 - 2 * i, 2) for i in range(n)]
 )
 rho_vector["C"] = lambda n: Weight("C", [n - i for i in range(n)])
 rho_vector["D"] = lambda n: Weight("D", [n - 1 - i for i in range(n)])
@@ -167,7 +166,7 @@ class WeightSpace(Container):
 
     def scalar_product(
         self, w1: Weight, w2: Weight, coeff: int = 1
-    ) -> Rational:
+    ) -> Fraction:
         """
         Computes the scalar product of the weights w1 and w2, with respect
         to the bilinear form on the weight space which is dual to the form
@@ -176,7 +175,7 @@ class WeightSpace(Container):
         """
         if not (w1 in self and w2 in self):
             raise ValueError("The weights do not belong to this weight space")
-        res = Rational(1, coeff) * sum(
+        res = Fraction(1, coeff) * sum(
             [
                 w1.coordinates[i] * w2.coordinates[i]
                 for i in range(len(w1.coordinates))
@@ -185,7 +184,7 @@ class WeightSpace(Container):
         if self.system == "A":
             return res
         else:
-            return Rational(1, 2) * res
+            return Fraction(1, 2) * res
 
     def lie_group(self) -> LieGroup:
         """

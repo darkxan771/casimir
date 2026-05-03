@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+from fractions import Fraction
 from math import prod
 from typing import Callable
-
-from sympy import Rational
 
 # DOMINANT WEIGHTS
 is_dominant: dict[str, Callable[[int, list], bool]] = {}
@@ -41,7 +40,7 @@ class Weight:
 
     def __init__(self, system: str = "A", L: list = []):
         self.system = system
-        self.coordinates = list(Rational(x) for x in L)
+        self.coordinates = list(Fraction(x) for x in L)
         self.rank = len(self.coordinates)
         if self.system == "A":
             self.rank -= 1

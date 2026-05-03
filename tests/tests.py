@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, "../src/")
 
-from sympy import Rational
+from fractions import Fraction
 
 from hypocasimir.labels import Partition, Signature
 from hypocasimir.lie import LieGroup, SymmetricSpace
@@ -32,9 +32,9 @@ def test_SUSO():
     assert W.coordinates == [3, 1, 0, -2, -2]
     assert P.size == 10
     assert P.dimension(G) == 2700
-    assert P.casimir(G) == Rational(-22, 5)
+    assert P.casimir(G) == Fraction(-22, 5)
     assert P.highest_K_type(X) == [Partition([5, 3])]
-    assert P.hypocasimir(X) == Rational(-9, 5)
+    assert P.hypocasimir(X) == Fraction(-9, 5)
     G2 = LieGroup("SU", 6)
     K2 = LieGroup("SO", 6)
     X2 = SymmetricSpace("SU/SO", 6)
@@ -42,9 +42,9 @@ def test_SUSO():
     assert X2.isotropy_group == [K2]
     assert K2.rank == 3
     assert P.dimension(G2) == 15750
-    assert P.casimir(G2) == Rational(-43, 9)
+    assert P.casimir(G2) == Fraction(-43, 9)
     assert P.highest_K_type(X2) == [Signature([5, 3, 2])]
-    assert P.hypocasimir(X2) == Rational(-19, 9)
+    assert P.hypocasimir(X2) == Fraction(-19, 9)
 
 
 def test_SU2SP():
@@ -58,9 +58,9 @@ def test_SU2SP():
     assert X.isometry_group == G
     assert X.isotropy_group == [K]
     assert P.dimension(G) == 11561550
-    assert P.casimir(G) == Rational(-132, 25)
+    assert P.casimir(G) == Fraction(-132, 25)
     assert P.highest_K_type(X) == [P]
-    assert P.hypocasimir(X) == Rational(-99, 50)
+    assert P.hypocasimir(X) == Fraction(-99, 50)
 
 
 def test_SPU():
@@ -81,9 +81,9 @@ def test_SPU():
     assert repr(RW) == "Weight space C(5)"
     assert RW.killing_coefficient == 12
     assert P.dimension(G) == 1514700
-    assert P.casimir(G) == Rational(-31, 6)
+    assert P.casimir(G) == Fraction(-31, 6)
     assert P.highest_K_type(X) == [Signature([5, 3, 2, 0, 0])]
-    assert P.hypocasimir(X) == Rational(-5, 2)
+    assert P.hypocasimir(X) == Fraction(-5, 2)
 
 
 def test_SO2U():
@@ -104,9 +104,9 @@ def test_SO2U():
     assert repr(RW) == "Weight space D(5)"
     assert RW.killing_coefficient == 8
     assert P.dimension(G) == 1316250
-    assert P.casimir(G) == Rational(-13, 2)
+    assert P.casimir(G) == Fraction(-13, 2)
     assert P.highest_K_type(X) == [Signature([5, 3, 2, 0, 0])]
-    assert P.hypocasimir(X) == Rational(-5, 2)
+    assert P.hypocasimir(X) == Fraction(-5, 2)
 
 
 def test_GrR():
@@ -122,16 +122,16 @@ def test_GrR():
     assert X1.isotropy_group == [K11, K12]
     assert G1.rank == 5
     assert P.dimension(G1) == 2502500
-    assert P.casimir(G1) == Rational(-27, 4)
+    assert P.casimir(G1) == Fraction(-27, 4)
     assert P.highest_K_type(X1) == [Signature([5, 3, 2]), Signature([1, 1])]
-    assert P.hypocasimir(X1) == Rational(-5, 2)
+    assert P.hypocasimir(X1) == Fraction(-5, 2)
     X2 = SymmetricSpace("GrR", (7, 3))
     assert P.highest_K_type(X2) == [Partition([5, 3, 2]), Partition([1])]
     assert P.hypocasimir(X2) == -2
     X3 = SymmetricSpace("GrR", (7, 4))
     P = Partition([5, 3, 2, 1, 1])
     assert P.highest_K_type(X3) == [Partition([5, 3, 2]), Signature([1, 1])]
-    assert P.hypocasimir(X3) == Rational(-7, 3)
+    assert P.hypocasimir(X3) == Fraction(-7, 3)
 
 
 def test_GrC():
@@ -145,9 +145,9 @@ def test_GrC():
     assert X.isometry_group == G
     assert G.rank == 6
     assert P.dimension(G) == 107800
-    assert P.casimir(G) == Rational(-222, 49)
+    assert P.casimir(G) == Fraction(-222, 49)
     assert P.highest_K_type(X) == [Signature([5, 3, 2, 1]), Partition([1])]
-    assert P.hypocasimir(X) == Rational(-29, 14)
+    assert P.hypocasimir(X) == Fraction(-29, 14)
 
 
 def test_GrH():
@@ -166,6 +166,6 @@ def test_GrH():
     assert X.isotropy_group == K
     assert G.rank == 7
     assert P.dimension(G) == 506970464
-    assert P.casimir(G) == Rational(-45, 8)
+    assert P.casimir(G) == Fraction(-45, 8)
     assert P.highest_K_type(X) == [Partition([5, 3, 2, 1]), Partition([1])]
-    assert P.hypocasimir(X) == Rational(-33, 16)
+    assert P.hypocasimir(X) == Fraction(-33, 16)
