@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from math import prod
-from typing import Callable
 
 # DOMINANT WEIGHTS
 is_dominant: dict[str, Callable[[int, list], bool]] = {}
@@ -37,7 +37,7 @@ class Weight:
     (type A/B/C/D).
     """
 
-    def __init__(self, system: str = "A", L: list = []):
+    def __init__(self, system: str, L: list):
         self.system: str = system
         self.coordinates: list = list(x for x in L)
         self.rank: int = len(self.coordinates)

@@ -1,5 +1,5 @@
+from collections.abc import Callable, Container
 from fractions import Fraction
-from typing import Callable, Container
 
 from ..lie import LieGroup
 from .named import (

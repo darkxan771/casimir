@@ -31,15 +31,21 @@ class Label(Protocol):
     terms: list[int]
 
     def __eq__(self, other: object) -> bool:
-        return self.terms == other.terms
+        from .partitions import Partition
+        from .signatures import Signature
 
-    def __len__(self):
+        if isinstance(other, Partition) or isinstance(other, Signature):
+            return self.terms == other.terms
+        else:
+            return False
+
+    def __len__(self) -> int:
         return len(self.terms)
 
-    def __abs__(self):
+    def __abs__(self) -> int:
         return sum(self.terms)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.terms)
 
     def __iter__(self):
@@ -70,5 +76,5 @@ class Label(Protocol):
     def hypocasimir(self, X: SymmetricSpace) -> Fraction: ...
 
 
-def general_casimir(L: list[Label], G: list[LieGroup], coeff: int):
-    return sum([L[i].casimir(G[i], coeff) for i in range(len(L))])
+def general_casimir(L: list[Label], G: list[LieGroup], coeff: int) -> Fraction:
+    return Fraction(sum([L[i].casimir(G[i], coeff) for i in range(len(L))]))

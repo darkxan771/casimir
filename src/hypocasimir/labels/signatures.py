@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from fractions import Fraction
 from math import prod
-from typing import Callable
 
 import matplotlib.pyplot as plt
 

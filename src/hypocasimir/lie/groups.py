@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 names: dict[str, str] = {}
 names["U"] = "Unitary Group"
