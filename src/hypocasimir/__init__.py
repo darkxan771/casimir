@@ -1,12 +1,14 @@
-# TODO: mixing time
-# TODO: fix types in highest_K_type
+# TODO: mixing time for Grassmannian manifolds
 
-from .labels import Partition, Signature
+from .computations import list_terms
+from .labels import Partition, Partitions, Signature
 from .lie import LieGroup, SymmetricSpace
 from .systems import Weight, WeightSpace
 
 __all__ = [
+    "list_terms",
     "Partition",
+    "Partitions",
     "Signature",
     "SymmetricSpace",
     "LieGroup",

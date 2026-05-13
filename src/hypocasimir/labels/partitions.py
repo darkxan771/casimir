@@ -109,7 +109,7 @@ class Partition(Label):
         by the integer partition.
         """
         if X.stype == "structure":
-            return compute_highest_type_structure[X.type](X.n, self.terms)
+            return compute_highest_type_structure[X.type](X.size, self.terms)
         else:
             return compute_highest_type_grassmann[X.type](X.p, X.q, self.terms)
 
@@ -139,7 +139,7 @@ class Partition(Label):
         coeff = G.weight_space.killing_coefficient
         cG = self.casimir(G)
         if X.type == "GrC":
-            n, p, q = X.n, X.p, X.q
+            n, p, q = X.size, X.p, X.q
             K1, K2 = LieGroup("SU", p), LieGroup("SU", q)
             L1 = Partition([a - L[0].terms[-1] for a in L[0].terms[:-1]])
             L2 = L[1]

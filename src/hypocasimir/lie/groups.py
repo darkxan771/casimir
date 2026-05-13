@@ -1,5 +1,7 @@
 from collections.abc import Callable
 
+import numpy as np
+
 names: dict[str, str] = {}
 names["U"] = "Unitary Group"
 names["SU"] = "Special Unitary Group"
@@ -68,6 +70,14 @@ class LieGroup:
         Returns the dimension of a maximal torus inside the Lie group.
         """
         return group_rank[self.type](self.size)
+
+    @property
+    def mixing_time(self) -> float:
+        """
+        Returns the mixing time of the standard Brownian motion on the Lie
+        group.
+        """
+        return float(4 * np.log(self.size))
 
     @property
     def weight_space(self):

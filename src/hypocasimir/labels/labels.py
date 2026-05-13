@@ -4,6 +4,8 @@ from collections.abc import Sequence
 from fractions import Fraction
 from typing import Protocol
 
+import numpy as np
+
 from ..lie import LieGroup, SymmetricSpace
 from ..systems import Weight
 
@@ -46,10 +48,22 @@ class Label(Protocol):
         return sum(self.terms)
 
     def __repr__(self) -> str:
-        return repr(self.terms)
+        if self.terms[-1] != 0:
+            return repr(self.terms)
+        else:
+            i = self.terms.index(0)
+            if i < len(self.terms) - 1:
+                res = repr(self.terms[:i])[:-1]
+                res += ", 0, ..]"
+            else:
+                res = repr(self.terms)
+            return res
 
     def __iter__(self):
         return iter(self.terms)
+
+    def __hash__(self):
+        return hash(tuple(self.terms))
 
     @property
     def length(self) -> int:
@@ -74,6 +88,21 @@ class Label(Protocol):
     def casimir(self, G: LieGroup, coeff: None | int) -> Fraction: ...
 
     def hypocasimir(self, X: SymmetricSpace) -> Fraction: ...
+
+    def up_term(self, S: LieGroup | SymmetricSpace) -> float:
+        """
+        Returns the term of the upper bound on dtv(mu_t, Haar)^2 at cutoff time.
+        """
+        if isinstance(S, LieGroup):
+            return float(
+                (self.dimension(S) ** 2)
+                * np.exp(self.casimir(S) * S.mixing_time)
+            )
+        else:
+            return float(
+                (self.dimension(S.isometry_group) ** 2)
+                * np.exp(self.hypocasimir(S) * S.mixing_time)
+            )
 
 
 def general_casimir(L: list[Label], G: list[LieGroup], coeff: int) -> Fraction:

@@ -81,6 +81,18 @@ class Signature(Label):
             self.terms[-1]
         )
 
+    def switch_signed_partition(self) -> Signature:
+        """
+        Switch the sign of the last term if the signature is a signed
+        partition.
+        """
+        if self.is_signed_partition:
+            L = self.terms.copy()
+            L[-1] *= -1
+            return Signature(L)
+        else:
+            raise ValueError("This is not a signed partition")
+
     def highest_weight(self, G: LieGroup) -> Weight:
         """
         If the signature is a signed partition with length n and if G=SO(2n),
@@ -100,7 +112,7 @@ class Signature(Label):
         by the signature.
         """
         if X.stype == "structure":
-            return compute_highest_type_structure[X.type](X.n, self.terms)
+            return compute_highest_type_structure[X.type](X.size, self.terms)
         else:
             return compute_highest_type_grassmann[X.type](X.p, X.q, self.terms)
 

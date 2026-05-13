@@ -1,5 +1,7 @@
 from collections.abc import Callable
 
+import numpy as np
+
 from .groups import LieGroup
 
 space_dimension_structure: dict[str, Callable[[int], int]] = {}
@@ -58,17 +60,17 @@ class SymmetricSpace:
     def __init__(self, type: str = "SU/SO", size: int | tuple[int, int] = 2):
         self.type: str = type
         self.stype: str = ""
-        self.n: int = 0
+        self.size: int = 0
         if type in {"SU/SO", "SU2/SP", "SP/U", "SO2/U"} and isinstance(
             size, int
         ):
             self.stype = "structure"
-            self.n = size
+            self.size = size
         elif type in {"GrR", "GrC", "GrH"} and isinstance(size, tuple):
             self.stype = "grassmann"
             self.p: int = max(size)
             self.q: int = min(size)
-            self.n = self.p + self.q
+            self.size = self.p + self.q
         else:
             raise NotImplementedError
 
@@ -76,13 +78,13 @@ class SymmetricSpace:
         return (
             isinstance(other, SymmetricSpace)
             and self.type == other.type
-            and self.n == other.n
+            and self.size == other.size
             and ((self.stype == "structure") or (self.p == other.p))
         )
 
     def __repr__(self):
         if self.stype == "structure":
-            return compute_repr_structure[self.type](self.n)
+            return compute_repr_structure[self.type](self.size)
         else:
             return compute_repr_grassmann[self.type](self.p, self.q)
 
@@ -103,10 +105,24 @@ class SymmetricSpace:
 
     @property
     def dimension(self) -> int:
+        """
+        Returns the real dimension of the symmetric space.
+        """
         if self.stype == "structure":
-            return space_dimension_structure[self.type](self.n)
+            return space_dimension_structure[self.type](self.size)
         else:
             return space_dimension_grassmann[self.type](self.p, self.q)
+
+    @property
+    def mixing_time(self) -> float:
+        """
+        Returns the mixing time of the hypoelliptic Brownian motion on the
+        isometry group of the symmetric space.
+        """
+        if self.stype == "structure":
+            return float(8 * np.log(self.size))
+        else:
+            raise NotImplementedError
 
     @property
     def isometry_group(self) -> LieGroup:
@@ -114,7 +130,7 @@ class SymmetricSpace:
         Returns the simple simply connected compact Lie group G such
         that X=G/K.
         """
-        return compute_G[self.type](self.n)
+        return compute_G[self.type](self.size)
 
     @property
     def isotropy_group(self) -> list[LieGroup]:
@@ -124,7 +140,7 @@ class SymmetricSpace:
         manifolds.
         """
         if self.stype == "structure":
-            return compute_K_structure[self.type](self.n)
+            return compute_K_structure[self.type](self.size)
         else:
             if self.type == "GrC":
                 raise NotImplementedError
