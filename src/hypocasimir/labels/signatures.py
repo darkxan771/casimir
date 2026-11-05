@@ -64,6 +64,16 @@ class Signature(Label):
             raise ValueError("The terms should be in nonincreasing order.")
         self.terms = list(L)
 
+    def __eq__(self, other: object) -> bool:
+        test = isinstance(self, Signature) and isinstance(other, Signature)
+        return test and self.terms == other.terms
+
+    def __getitem__(self, a: int) -> int:
+        return self.terms[a]
+
+    def __hash__(self):
+        return hash(tuple(self.terms))
+
     @property
     def length(self) -> int:
         """

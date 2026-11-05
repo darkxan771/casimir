@@ -1,6 +1,9 @@
 from collections.abc import Callable
 
 import numpy as np
+from scipy.linalg import block_diag
+
+from .bases_lie_algebra import bases_lie_algebra
 
 names: dict[str, str] = {}
 names["U"] = "Unitary Group"
@@ -24,6 +27,24 @@ compute_system: dict[str, Callable[[int], str]] = {}
 compute_system["SU"] = lambda _: "A"
 compute_system["SO"] = lambda n: "B" if n % 2 == 1 else "D"
 compute_system["SP"] = lambda _: "C"
+
+
+def Jmatrix(n: int) -> np.array:
+    J = np.array([[0, 1], [-1, 0]])
+    return block_diag(*([J] * n))
+
+
+def involution_sp(M: np.array) -> np.array:
+    n = int(M.shape[0] / 2)
+    Jn = Jmatrix(n)
+    res = -(Jn @ M) @ Jn
+    return res.transpose()
+
+
+defining_involution: dict[str, Callable[[np.array], np.array]] = {}
+defining_involution["SU"] = lambda M: (M + 0j).conjugate().transpose()
+defining_involution["SO"] = lambda M: M.transpose()
+defining_involution["SP"] = involution_sp
 
 
 class LieGroup:
@@ -89,3 +110,40 @@ class LieGroup:
         from ..systems import WeightSpace
 
         return WeightSpace(compute_system[self.type](self.size), self.rank)
+
+    def basis_lie_algebra(self, normalised: bool = True) -> list[np.array]:
+        """
+        Returns an orthogonal basis of the Lie algebra of the compact Lie
+        group.
+        """
+        return bases_lie_algebra[self.type](self.size, normalised)
+
+    def defining_involution(self, g: np.array) -> np.array:
+        """
+        The defining involution of the compact Lie Group.
+        """
+        return defining_involution[self.type](g)
+
+    @property
+    def scalar_product(self) -> Callable[[np.array, np.array], float]:
+        """
+        The scalar product given by the opposite of the Killing form (or by
+        -2n * tr(XY) in the case of unitary groups).
+        """
+        if self.type == "U":
+            c = 2 * self.size
+        else:
+            c = self.weight_space.killing_coefficient
+        return lambda X, Y: -c * (X @ Y).trace().real
+
+    def casimir(self) -> np.array:
+        """
+        Computes the Casimir element of the group G, which is the sum
+
+        C = sum X otimes X
+
+        in the tensor product g otimes g of the Lie algebra g of G by itself.
+        The sum runs over an orthonormal basis of elements X of g.
+        """
+        b = self.basis_lie_algebra()
+        return sum([np.kron(X, X) for X in b])

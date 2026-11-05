@@ -2,6 +2,12 @@ from collections.abc import Callable
 
 import numpy as np
 
+from .bases_lie_algebra import (
+    bases_k_grassmann,
+    bases_k_structure,
+    bases_m_grassmann,
+    bases_m_structure,
+)
 from .groups import LieGroup
 
 space_dimension_structure: dict[str, Callable[[int], int]] = {}
@@ -120,9 +126,11 @@ class SymmetricSpace:
         isometry group of the symmetric space.
         """
         if self.stype == "structure":
-            return float(8 * np.log(self.size))
+            return float(8 * np.log(self.isometry_group.size))
         else:
-            raise NotImplementedError
+            return float(
+                4 * self.size / self.q * np.log(self.isometry_group.size)
+            )
 
     @property
     def isometry_group(self) -> LieGroup:
@@ -145,3 +153,70 @@ class SymmetricSpace:
             if self.type == "GrC":
                 raise NotImplementedError
             return compute_K_grassmann[self.type](self.p, self.q)
+
+    def basis_k(self) -> list[np.array]:
+        """
+        Returns an orthonormal basis of the Lie subalgebra k of g.
+        """
+        if self.stype == "structure":
+            return bases_k_structure[self.type](self.size)
+        else:
+            return bases_k_grassmann[self.type](self.p, self.q)
+
+    def basis_m(self) -> list[np.array]:
+        """
+        Returns an orthonormal basis of the orthogonal complement m of the
+        Lie subalgebra k of g.
+        """
+        if self.stype == "structure":
+            return bases_m_structure[self.type](self.size)
+        else:
+            return bases_m_grassmann[self.type](self.p, self.q)
+
+    def casimir(self) -> np.array:
+        """
+        Computes the hypoelliptic Casimir element of the symmetric space
+        X = G/K, which is the sum
+
+        C = sum V otimes V
+
+        in the tensor product g otimes g of the Lie algebra g of G by itself.
+        The sum runs over an orthonormal basis of elements V of m, the
+        orthogonal complement of k in g.
+        """
+        b = self.basis_m()
+        return sum([np.kron(X, X) for X in b])
+
+    def completed_casimir(self) -> np.array:
+        """
+        Computes the completed hypoelliptic Casimir element of the symmetric
+        space X = G/K, which is the sum
+
+        C = sum (I/2 otimes V^2 + V otimes V + V^2 otimes I/2)
+
+        in the tensor product g otimes g of the Lie algebra g of G by itself.
+        The sum runs over an orthonormal basis of elements V of m, the
+        orthogonal complement of k in g.
+        """
+        b = self.basis_m()
+        if self.isometry_group.type == "SP":
+            d = 2 * self.isometry_group.size
+        else:
+            d = self.isometry_group.size
+        A = (1 / 2) * sum([np.kron(np.eye(d), X @ X) for X in b])
+        B = sum([np.kron(X, X) for X in b])
+        C = (1 / 2) * sum([np.kron(X @ X, np.eye(d)) for X in b])
+        return A + B + C
+
+    def conj_completed_casimir(self) -> np.array:
+        b = self.basis_m()
+        if self.isometry_group.type == "SP":
+            d = 2 * self.isometry_group.size
+        else:
+            d = self.isometry_group.size
+        A = (1 / 2) * sum(
+            [np.kron(np.eye(d), X.conjugate() @ X.conjugate()) for X in b]
+        )
+        B = sum([np.kron(X, X.conjugate()) for X in b])
+        C = (1 / 2) * sum([np.kron(X @ X, np.eye(d)) for X in b])
+        return A + B + C

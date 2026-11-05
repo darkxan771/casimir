@@ -92,6 +92,19 @@ class Partition(Label):
             raise ValueError("The parts should be in nonincreasing order.")
         self.terms: list[int] = list(filter((0).__ne__, L))
 
+    def __eq__(self, other: object) -> bool:
+        test = isinstance(self, Partition) and isinstance(other, Partition)
+        return test and self.terms == other.terms
+
+    def __getitem__(self, a: int) -> int:
+        if a < len(self):
+            return self.terms[a]
+        else:
+            return 0
+
+    def __hash__(self):
+        return hash(tuple(self.terms))
+
     def highest_weight(self, G: LieGroup) -> Weight:
         """
         Converts the integer partition to a highest weight of an irreducible

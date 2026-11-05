@@ -32,14 +32,7 @@ class Label(Protocol):
 
     terms: list[int]
 
-    def __eq__(self, other: object) -> bool:
-        from .partitions import Partition
-        from .signatures import Signature
-
-        if isinstance(other, Partition) or isinstance(other, Signature):
-            return self.terms == other.terms
-        else:
-            return False
+    def __eq__(self, other: object) -> bool: ...
 
     def __len__(self) -> int:
         return len(self.terms)
@@ -62,8 +55,7 @@ class Label(Protocol):
     def __iter__(self):
         return iter(self.terms)
 
-    def __hash__(self):
-        return hash(tuple(self.terms))
+    def __getitem__(self, a: int) -> int: ...
 
     @property
     def length(self) -> int:
